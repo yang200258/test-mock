@@ -2,7 +2,7 @@
     <div class="login-container">
         <article class="login-content">
             <el-form :model="loginForm" :rules="loginRule" ref="loginForm" label-position="left" label-width="0px">
-                <h3 class="title">考勤系统登录</h3>
+                <h3 class="title">mock登录</h3>
                 <el-form-item prop="username">
                     <el-input type="text" v-model="loginForm.username" auto-complete="off" placeholder="请输入用户名"></el-input>
                 </el-form-item>
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import {mapMutations,mapActions} from 'vuex'
+// import {mapMutations,mapActions} from 'vuex'
 // import MyForm from '@/components/common/MyForm'
 export default {
     data() {
@@ -37,14 +37,6 @@ export default {
         }
     },
     methods: {
-        ...mapMutations({
-            setRootNode: 'setRootNode'
-        }),
-        ...mapActions({
-            login:'auth/login',
-            getAccountDetail: 'auth/getAccountDetail',
-            getOrganization: 'getOrganization'
-        }),
         //登录请求
         loginRequest: function() {
             this.$refs.loginForm.validate(valid=> {
@@ -58,21 +50,18 @@ export default {
         },
         //登录封装方法(登录、获取用户详情、获取机构信息)
         async authLogin(username,password) {
-            let login = await this.login({username,password})
+            let login = await this.$axios({ url: '/sys/accounts/login', method: 'post', data: {username,password} })
             if(login) {
-                let detail = await this.getAccountDetail()
-                if(detail.userId) {
-                    this.logining = false
-                    this.$message.success('登录成功！')
-                    this.$router.push('home')
-                    //获取最高层级机构信息
-                    let res = await this.getOrganization({id:0,level:0})
-                    this.setRootNode(res)
+                this.logining = false
+                this.$message.success('登录成功！')
+                this.$router.push({
+                    name: 'home',
+                    params: {
+                        token: login.token,
+                        code: login.code
+                    }
+                })
                 } else {
-                    this.$message.error(detail.msg)
-                    this.logining = false
-                }
-            } else {
                 this.$message.error('登录异常')
                 this.logining = false
             }

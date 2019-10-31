@@ -1,6 +1,5 @@
 /**
  * axios全局配置
- * TODO: 拦截器全局配置，根据实际情况修改
  */
 import axios from 'axios'
 import router from '../router'
@@ -32,8 +31,8 @@ const service = axios.create({
     timeout: 5000,
 });
 
-// baseURL
-axios.defaults.baseURL = 'http://10.28.128.123:8080/'
+// baseURL(对接接口是解锁)
+// axios.defaults.baseURL = 'http://10.28.128.123:8080/'
 
 // http request 拦截器
 // 每次请求都为http头增加Authorization字段，其内容为token

@@ -1,8 +1,10 @@
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
+// eslint-disable-next-line no-unused-vars
+const ExtractTextPlugin = require("extract-text-webpack-plugin")
+
 const productionGzipExtensions = ['js', 'css']
     // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
     // const htmlwebpackplugin = require('html-webpack-plugin')
-
 module.exports = {
     publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
     // build时构建文件的目录 构建时传入 --no-clean 可关闭该行为
@@ -43,7 +45,7 @@ module.exports = {
                     threshold: 10240,
                     minRatio: 0.8
                 }),
-                // new htmlwebpackplugin()
+                // new ExtractTextPlugin("style.css")
             )
         } else {
             // 为开发环境修改配置...
@@ -72,6 +74,21 @@ module.exports = {
             .use('url-loader')
             .loader('url-loader')
             .tap(options => Object.assign(options, { limit: 10240 }))
+        config.module
+            .rule('vue')
+            .use('vue-loader')
+            .loader('vue-loader')
+            // eslint-disable-next-line no-unused-vars
+            .tap(options => {
+                options.loaders = {
+                    css: ExtractTextPlugin.extract({
+                      use: 'css-loader',
+                      fallback: 'vue-style-loader' // <- 这是vue-loader的依赖，所以如果使用npm3，则不需要显式安装
+                    })
+                  }
+                return options
+            })
+        // config.plugins.push(new ExtractTextPlugin("style.css"))
     },
     // css的处理
     css: {
